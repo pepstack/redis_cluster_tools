@@ -235,13 +235,21 @@ redis 集群是指多个 redis-server 实例（服务进程）运行一台或多
 
 集群完全支持 tls 证书。参考配置：redis/conf/cluster.distributed。
 
+  “certs” 是 redis 自带的测试工具生成的。当 build 好集群源码，执行 "build/redis-8.2.0/utils/gen-test-certs.sh" 如下：
+
+      $ cd build/redis-8.2.0/
+
+      $ rm -rf tests/tls
+
+      $ utils/gen-test-certs.sh
+
+  然后将 tests/tls 复制为 redis/conf/cluster.distributed/certs
+
 配置文件 redis_cluster.ini 中设置 (tls_enabled=yes)，集群就启用了证书支持。redis_cluster.sh 会自动将 “certs” 目录复制到集群部署目录下。集群所有节点必须使用同一个 certs，部署到每个服务器。如果客户端通过证书连接集群，使用:
 
     tlsconnect_redis-$nodeid.sh。
 
 ** 启用 tls 与 tcp 不矛盾。其实应该同时启用，服务器之间的主从备份使用 tcp，客户端可以使用 tls 连接 redis 集群服务。**
-
-参考 DeepSeek: Redis TLS 证书创建指南
 
 ### 7. TODO
 
