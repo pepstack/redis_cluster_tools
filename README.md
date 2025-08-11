@@ -55,11 +55,11 @@ redis 集群是指多个 redis-server 实例（服务进程）运行一台或多
 
     $ sudo yum groupinstall -y "Development Tools"
 
-    $ sudo yum install -y pkgconfig openssl-devel tcl
+    $ sudo yum install -y pkgconfig openssl-devel tcl-devel cmake valgrind
 
   - Ubuntu/Debian:
 
-    $ sudo apt install -y build-essential pkg-config libssl-dev tcl
+    $ sudo apt install -y build-essential pkg-config libssl-dev tcl-dev cmake valgrind
 
 - jemalloc 编译安装(好像并无必要)
 

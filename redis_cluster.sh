@@ -253,7 +253,7 @@ function build() {
     tar -xzf "$pkgs_dir/$hiredis_pkg" -C "$cluster_build_dir"
 
     echoinfo "($FUNCNAME) 编译: $redis_name-$redis_verno"
-    cd "$redis_build_dir" && make BUILD_TLS="$build_tls_mode"
+    cd "$redis_build_dir" && make BUILD_WITH_MODULES=$build_with_modules BUILD_TLS="$build_tls_mode"
 
     echoinfo "($FUNCNAME) 编译: $hiredis_name-$hiredis_verno"
     cd "$hiredis_build_dir" && make USE_SSL=1
