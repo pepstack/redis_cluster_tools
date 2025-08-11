@@ -1,0 +1,35 @@
+#!/bin/bash
+# redis cluster uri: [redis://host:port@cluster/]
+
+# Treat unset variables as an error
+set -o nounset
+
+# Treat any error as exit
+set -o errexit
+
+_selfdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$_selfdir/cluster_env.sh"
+
+echo "[redis://{NODEHOST}@$CLUSTERID] Stopping {NODEID} ..."
+
+ports=({PORTS})
+
+export REDISCLI_AUTH="$CLUSTERAUTHPASS"
+
+# 使用 for 循环遍历数组
+for port in "${ports[@]}"
+do
+    nodepid=$(cat "$CLUSTERHOME/run/redis-{NODEID}-$port.pid")
+
+    "$CLUSTERHOME/bin/redis-cli" -h "{NODEHOST}" -p "$port" SHUTDOWN SAVE
+
+    while [ -x "/proc/$nodepid" ]
+    do
+        echo "[redis://{NODEHOST}:$port@$CLUSTERID] Waiting for pid:$nodepid shutdown ..."
+        sleep 1
+    done
+
+    echo "[redis://{NODEHOST}:$port@$CLUSTERID] pid:$nodepid shutdown"
+done
+
+echo "[redis://{NODEHOST}@$CLUSTERID] {NODEID} stopped."

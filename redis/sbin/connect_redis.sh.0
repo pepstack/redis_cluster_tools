@@ -1,0 +1,19 @@
+#!/bin/bash
+# redis cluster uri: [redis://host:port@cluster/]
+
+# Treat unset variables as an error
+set -o nounset
+
+# Treat any error as exit
+set -o errexit
+
+_selfdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$_selfdir/cluster_env.sh"
+
+echo "[redis://{NODEHOST}@$CLUSTERID] Client TCP connecting to: {NODEID}:{PORT} ..."
+
+export REDISCLI_AUTH="$CLUSTERAUTHPASS"
+
+"$CLUSTERHOME/bin/redis-cli" -c -h {NODEHOST} -p {PORT}
+
+exit 0

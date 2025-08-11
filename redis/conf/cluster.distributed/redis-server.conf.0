@@ -1,0 +1,101 @@
+################################################################
+# Redis Configuration File On Host Server: {HOST}
+#  redis-{NODEID}-{PORT}.conf
+#
+# This is a redis configuration file of cluster: {CLUSTERID}
+# Note that in order to start redis-server as a cluster node,
+# Redis must be started with full path of this file as first
+#  argument like the following lines:
+#   $ cd {CLUSTER_HOME_DIR}/
+#   $ ./bin/redis-server ./conf/redis-{NODEID}-{PORT}.conf
+################################################################
+
+# use config files:
+#include     {CLUSTER_HOME_DIR}/conf/redis_server.conf
+#include     {CLUSTER_HOME_DIR}/conf/other.conf
+
+# use modules:
+#loadmodule        {CLUSTER_HOME_DIR}/modules/redisgraph.so
+#loadmodule        {CLUSTER_HOME_DIR}/modules/redisbloom.so
+#loadmodule        {CLUSTER_HOME_DIR}/modules/rejson.so
+
+protected-mode               yes
+
+# listens on one or more specific IPv4 addresses
+bind                         {ADDRS}
+port                         {PORT}
+
+daemonize                    yes
+pidfile                      {CLUSTER_HOME_DIR}/run/redis-{NODEID}-{PORT}.pid
+
+loglevel                     notice
+logfile                      {CLUSTER_HOME_DIR}/log/redis-{NODEID}-{PORT}.log
+
+cluster-enabled              yes
+cluster-node-timeout         15000
+cluster-config-file          {CLUSTER_HOME_DIR}/cluster-{NODEID}-{PORT}.conf
+
+tcp-backlog                  2048
+
+unixsocket                   {CLUSTER_HOME_DIR}/run/redis-{NODEID}-{PORT}.sock
+unixsocketperm               700
+
+# Close the connection after a client is idle for N seconds (0 to disable)
+timeout                      1800
+tcp-keepalive                300
+
+# The default value is 0, which implies no marking is required.
+socket-mark-id               0
+
+maxclients                   200
+maxmemory                    10GB
+maxmemory-policy             noeviction
+
+requirepass                  {PASSWORD}
+masterauth                   {PASSWORD}
+
+# using no limits:
+client-output-buffer-limit   normal 0 0 0
+client-output-buffer-limit   slave 0 0 0
+client-output-buffer-limit   pubsub 0 0 0
+
+######################### TLS/SSL ##############################
+{TLS_HASHTAG}tls-port                     {TLS_PORT}
+
+{TLS_HASHTAG}tls-cert-file                {TLS_CERTFILE}
+{TLS_HASHTAG}tls-key-file                 {TLS_KEYFILE}
+
+# Configure a DH parameters file to enable Diffie-Hellman (DH) key exchange,
+# required by older versions of OpenSSL (<3.0). Newer versions do not require
+# this configuration and recommend against it.
+{TLS_HASHTAG}tls-dh-params-file           {TLS_DHFILE}
+
+{TLS_HASHTAG}tls-ca-cert-file             {TLS_CACERTDIR}/{TLS_CACERT}
+{TLS_HASHTAG}tls-ca-cert-dir              {TLS_CACERTDIR}
+
+################### SNAPSHOT DUMP MODE #########################
+# Snapshotting can be completely disabled with a single empty string argument
+# as in following example: 
+#
+# save ""
+
+# Unless specified otherwise, by default Redis will save the DB:
+#   * After 3600 seconds (an hour) if at least 1 change was performed
+#   * After 300 seconds (5 minutes) if at least 100 changes were performed
+#   * After 60 seconds if at least 10000 changes were performed
+save 3600 1 300 100 60 10000
+
+# The RDB will be written inside this directory, with the filename specified
+dir                          {CLUSTER_HOME_DIR}/{RDB_DIR}
+dbfilename                   snapshot-{NODEID}-{PORT}.rdb
+rdbcompression               yes
+
+######################### REPLICATION ##########################
+appendonly                   yes
+appenddirname                appendonly
+appendfilename               replica-{NODEID}-{PORT}.aof
+appendfsync                  everysec
+
+no-appendfsync-on-rewrite    yes
+auto-aof-rewrite-percentage  100
+auto-aof-rewrite-min-size    512mb

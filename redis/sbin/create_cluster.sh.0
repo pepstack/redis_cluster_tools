@@ -1,0 +1,21 @@
+#!/bin/bash
+# create cluster once after starting all redis-servers
+# 生成 redis 集群初始创建脚本. 不要使用 tls 端口做集群!
+# redis cluster uri: [redis://host:port@cluster/]
+#
+# Treat unset variables as an error
+set -o nounset
+
+# Treat any error as exit
+set -o errexit
+
+_selfdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$_selfdir/cluster_env.sh"
+
+nodes=$(xargs < "$CLUSTERHOME/CLUSTER_ALL_NODES")
+
+echo "[redis://$CLUSTERID] Creating cluster: {$nodes} ..."
+
+export REDISCLI_AUTH="$CLUSTERAUTHPASS"
+
+$CLUSTERHOME/bin/redis-cli --cluster create $nodes --cluster-replicas $CLUSTERREPLICAS
