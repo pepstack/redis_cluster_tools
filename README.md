@@ -86,6 +86,25 @@ redis 集群是指多个 redis-server 实例（服务进程）运行一台或多
 
   需要压缩为 tar 包，如：hiredis-1.30.tar.gz
 
+- 设置服务器之间免密登录
+
+  下面的过程在集群的每台服务器执行：
+
+      $ ssh-keygen -t ed25519 -C "cheungmine@qq.com"
+
+      添加下面的 host 条目到文件：/etc/hosts
+
+        10.0.1.8  redis_ubuntu  # 本服务器
+        10.0.2.5  hacl-node2
+        10.0.2.6  hacl-node3
+        10.0.2.7  hacl-node1
+
+      复制本服务器的公钥到其他服务器的 ~/.ssh/authorized_keys:
+
+        $ ssh-copy-id -i ~/.ssh/id_ed25519.pub root1@hacl-node1
+        $ ssh-copy-id -i ~/.ssh/id_ed25519.pub root1@hacl-node2
+        $ ssh-copy-id -i ~/.ssh/id_ed25519.pub root1@hacl-node3
+
 ### 2. 创建集群配置文件
 
 假设这里的集群ID为: samplecl ($CLUSTERID=samplecl)
